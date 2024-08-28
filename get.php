@@ -1,11 +1,12 @@
 <?php
 require_once('PhpXlsxGenerator.php');
 include 'connection.php';
+
 if (isset($_POST['to_date']) && isset($_POST['from_date'])) {
     $from_date = $_POST['from_date'];
     $to_date = $_POST['to_date'];
 
-    $fileName = "members_data_" . date('Y-m-d') . '.csv';
+    $fileName = "date_wise_record" . date('Y-m-d') . '.csv';
 
     $exceldata[] = array('Name', 'Email', 'Mobile ');
     $sql = "SELECT * FROM customer where fetch_date between '$to_date' AND '$from_date' ";
@@ -18,10 +19,40 @@ if (isset($_POST['to_date']) && isset($_POST['from_date'])) {
             $linedata = array($row['cname'], $row['cmobile'], $row['cemail']);
             $exceldata[] = $linedata;
         }
-    } else {
-         
-        echo 'record Not found';
     }
+
+
+
+    //else if close
+
+
+
+    $xlxs = CodexWorld\PhpXlsxGenerator::fromArray($exceldata);
+    $xlxs->downloadAs($fileName);
+    exit();
+} //main if  close
+else if(isset($_POST['submit'])){
+    $from_date = $_POST['from_date'];
+    $to_date = $_POST['to_date'];
+    
+    $fileName = "date_wise_record" . date('Y-m-d') . '.csv';
+
+    $exceldata[] = array('Name', 'Email', 'Mobile ');
+    $sql = "SELECT * FROM customer";
+    $result = mysqli_query($con, $sql);
+    
+
+    if (mysqli_num_rows($result) > 0) {
+        // print_r($ph);
+        // exit;
+
+        while ($row = mysqli_fetch_array($result)) {
+
+            $linedata = array($row['cname'], $row['cmobile'], $row['cemail']);
+            $exceldata[] = $linedata;
+        }
+    }
+
     $xlxs = CodexWorld\PhpXlsxGenerator::fromArray($exceldata);
     $xlxs->downloadAs($fileName);
     exit();
@@ -58,7 +89,7 @@ if (isset($_POST['to_date']) && isset($_POST['from_date'])) {
                 <input type="date" class="form-control" name="from_date" id="from_date">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">GET RECORD</button>
+                <button type="submit" class="btn btn-primary mb-3" name="submit">GET RECORD</button>
             </div>
         </form>
 
